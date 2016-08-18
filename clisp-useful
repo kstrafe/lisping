@@ -1,0 +1,57 @@
+Useful lisp stuff:
+
+quote or '
+list
+defun
+defparameter
+setf
+let* and let
+first
+rest
+length
+cons
+append
+reverse
+random
+
+concatenate
+subseq
+
+format
+print
+
+t
+numberp
+oddp
+evenp
+=, >, <,...
+string=
+listp
+eq
+null
+if
+progn
+
+dolist
+values
+cond
+defun
+defmacro
+macroexpand
+multiple-value-bind
+float
+
+read
+read-char
+write
+write-char
+
+setq
+aref
+elt
+#\C
+string
+type-of
+
+make-hash-table
+make-array
