@@ -19,6 +19,8 @@ subseq
 
 format
 print
+prin1
+princ
 
 t
 numberp
@@ -55,3 +57,15 @@ type-of
 
 make-hash-table
 make-array
+
+gethash
+
+defpackage
+in-package
+
+open
+close
+
+(defun open-bracket-macro-character (stream char) `,(read-delimited-list \#] stream t))
+(set-macro-character #\[ #'open-bracket-macro-character)
+(set-macro-character #\] (get-macro-character #\)))
