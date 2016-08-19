@@ -1,11 +1,7 @@
-#! /usr/bin/env clisp
-(print (rem 3 2))
-; (defun name (args...) (impl))
-(defun a (x) (* x x))
-(defmacro b (x) (a (a (* x x))))
-(print (a 3))
-(print (b 3))
-(print (getf '(:a 1 :b 2 :c 3) :c))
-(setq answer (read-line))
-(print answer)
-(print (type-of answer))
+(defpackage util
+	(:export init)
+	(:use common-lisp)
+)
+(in-package util)
+
+(defun init () 'util-init!)
