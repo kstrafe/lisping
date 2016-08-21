@@ -69,3 +69,29 @@ close
 (defun open-bracket-macro-character (stream char) `,(read-delimited-list \#] stream t))
 (set-macro-character #\[ #'open-bracket-macro-character)
 (set-macro-character #\] (get-macro-character #\)))
+
+documentation
+zerop
+&optional
+&rest
+&key
+defvar
+defparameter
+
+[declaim [optimize [speed 0] [debug 3]]]
+
+incf
+decf
+
+gensym
+dotimes
+dolist
+do
+
+defstruct
+defclass
+
+apropos
+describe
+inspect
+
