@@ -95,3 +95,85 @@ apropos
 describe
 inspect
 
+nconc
+car
+cdr
+
+rplaca rplacd
+reduce
+some
+all
+every
+notany
+notevery
+
+map map-into maplist mapl mapcon mapcar mapc mapcan
+
+elt
+count
+fill replace position find search mismatch
+sort merge
+
+disassemble
+
+eq eql equal equalp
+boole ; for bit logic
+
+[defun exaple (a b &key [c 1] [d 2])
+	nil
+]
+
+advise
+watch
+
+chapter 23 on signals and errors
+24 - on format
+
+defconstant ; Use +pi+ convention
+provide
+require
+
+makunbound
+cadr
+
+intern symbol-name
+
+The cool thing about lisp is that we're free to be free, but what about memory management?
+Well, we could just go with lisp's gc, but that's a chicken's way out. Is there another
+method? We could go manual:
+
+	fn alpha(input: &'a str) -> &'a str {
+		input[2..]
+	}
+	[fn alpha [input [& a str]]
+	          [& a str]
+		[subseq input 2]
+	]
+
+	[= cool 10]
+	[= some [new 32u]]
+	[= [some element] [new 32u]]
+	[print "Toppest of keks"]
+	[macro friend (a b c)
+		[print [+ a b c]]
+	]
+	[let something [alpha "Quite cool"]]
+	[alpha something]
+
+This would be really clean, no use of ' or `, but then how do we create macros?
+
+	[@ 1 2 3]
+
+is the same as
+
+	'[1 2 3]
+
+Why does lisp evaluate eagerly? I think we shouldn't eval eagerly.
+
+	[ignore [1 2 3]]  ;
+
+	[+ 1 [- 3 3]]
+
+	[macro let [name expr]
+		[= name [eval expr]]
+	]
