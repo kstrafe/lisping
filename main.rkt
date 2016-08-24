@@ -10,12 +10,38 @@
 	[display "A racket source file"]
 
 	[define-syntax foo
-		[syntax-rules (:)
+		[syntax-rules ()
 			; We write patterns here
 			[(_ [x]) (display "we wuz kangz")]
-			[(_ : x) (display x)]
-		]
-	]
+			[(_ : x) (display x)]]]
+
+	[define-syntax swap
+		[syntax-rules ()
+			[(_ a b) (let ([tmp a])
+								[set! a b]
+								[set! b tmp])]]]
+
+	[display "\n"]
+
+	[define-syntax displays
+		[syntax-rules ()
+			[(_ a ...) (display (list a ...))]]]
+
+	[define-syntax macrod
+		[syntax-rules ()
+			[(_ name (a) body)
+				[display [quote (name a body)]]
+	]]]
+
+	[macrod cool (kewl) [display]]
+
+	[let ([tmp 100] [a 3] [c 45])
+		[swap a c]
+		[displays a c]
+		[display a]
+		[display "\n"]
+		[display c]
+		[display "\n"]]
 
 	[foo : 'we-really-need-some-help-over-here!]
 
