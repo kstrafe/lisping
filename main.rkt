@@ -1,16 +1,22 @@
 [module main racket
-	[require 2htdp/image]
+	[define-syntax skip
+		[syntax-rules ()
+			[(_ body ...) #f]]]
+
+	[skip [require 2htdp/image]
 	[define tri
-		[let sierpinski ([n 5])
+		[let sierpinski ([n 14])
 			[if (zero? n)
 				[triangle 2 'solid 'red]
 				[let ([t (sierpinski [- n 1])])
 					[freeze [above t (beside t t)]]]]]]
 	[save-image tri "file.png"]
+	]
 	[display "A racket source file"]
 
+
 	[define-syntax foo
-		[syntax-rules ()
+		[syntax-rules (:)
 			; We write patterns here
 			[(_ [x]) (display "we wuz kangz")]
 			[(_ : x) (display x)]]]
@@ -21,19 +27,28 @@
 								[set! a b]
 								[set! b tmp])]]]
 
+	[define-syntax fn
+		[syntax-rules ()
+			[(_ name (arg ...) body ...) (
+				define (name arg ...) [begin body ...])]]]
+
+	[fn whatever () [display "function whatever"]]
+	[whatever]
+
+	[when #f [display 'cool] [display 'nice]]
+
 	[display "\n"]
 
 	[define-syntax displays
 		[syntax-rules ()
 			[(_ a ...) (display (list a ...))]]]
 
-	[define-syntax macrod
+	[define-syntax loop
 		[syntax-rules ()
-			[(_ name (a) body)
-				[display [quote (name a body)]]
-	]]]
+			[(loop body ...) (let looper () [begin body ... (looper)])]]]
 
-	[macrod cool (kewl) [display]]
+	[define x 1]
+	[loop [displays x "\n"] [sleep 0.05] [set! x (+ x 1)]]
 
 	[let ([tmp 100] [a 3] [c 45])
 		[swap a c]
@@ -42,6 +57,7 @@
 		[display "\n"]
 		[display c]
 		[display "\n"]]
+	[begin [display 1] [display 23]]
 
 	[foo : 'we-really-need-some-help-over-here!]
 
@@ -52,3 +68,4 @@
 	[display max-hp]
 
 ]
+
