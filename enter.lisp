@@ -7,7 +7,8 @@
 [ql:quickload :cl-opengl]
 
 
-(defun basic-test ()
+[defparameter value 1.0]
+(defun basic-test []
   "The kitchen sink."
   (sdl2:with-init (:everything)
     (format t "Using SDL Library Version: ~D.~D.~D~%"
@@ -71,7 +72,8 @@
 
             (:mousemotion (:x x :y y :xrel xrel :yrel yrel :state state)
              (format t "Mouse motion abs(rel): ~a (~a), ~a (~a)~%Mouse state: ~a~%"
-                     x xrel y yrel state))
+                     x xrel y yrel state)
+						 (setf value [+ 0.01 value]))
 
             (:controlleraxismotion (:which controller-id :axis axis-id :value value)
              (format t "Controller axis motion: Controller: ~a, Axis: ~a, Value: ~a~%"
@@ -88,7 +90,7 @@
              (gl:color 1.0 0.0 0.0)
              (gl:vertex 0.0 1.0)
              (gl:vertex -1.0 -1.0)
-             (gl:vertex 1.0 -1.0)
+             (gl:vertex value -1.0)
              (gl:end)
              (gl:flush)
              (sdl2:gl-swap-window win))
