@@ -75,4 +75,6 @@
 [fn kek () [display "We kek around a lot"]]
 [kek]
 
+[display "\n~a"]
+
 ]
