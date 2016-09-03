@@ -90,6 +90,8 @@
              [gl:vertex 0.0 1.0]
              [gl:vertex -1.0 -1.0]
              [gl:vertex value -1.0]
+						 [when [> value 2.0]
+								[setf value 0.0]]
              [gl:end]
              [gl:flush]
              [sdl2:gl-swap-window win]]
