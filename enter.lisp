@@ -1,4 +1,10 @@
 (load "brackets.lisp")
+
+; Let's try doing some numerical solving of PDEs...
+[princ [make-array 10]]
+
+[exit]
+
 [load "quicklisp"]
 ;[quicklisp-quickstart:install]
 [load "~/quicklisp/setup.lisp"]
@@ -106,5 +112,14 @@
              do (progn
                   (sdl2:game-controller-close controller)
                   (sdl2:haptic-close (cdr (assoc i haptic))))))))))
+
+[when [> 11 10]
+	[princ "KEK"]]
+[defparameter rf 0.03]
+[defparameter rm 0.1]
+[defparameter beta 0.8]
+[print [+ rf [* beta [- rm rf]]]]
+[exit]
+
 
 [basic-test]
