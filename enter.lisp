@@ -1,8 +1,22 @@
 (load "brackets.lisp")
 
 ; Let's try doing some numerical solving of PDEs...
-[princ [make-array 10]]
+; Use the FTCS method with reservoirs on both ends
+; A metal rod, 1D
+; T^{n+1}_j = T^n_j + alpha*dt/dx/dx*(T_{j+1} - 2T + T_{j-1}
+[defparameter bar-length 1]
+[defparameter grid-points 100]
+[defparameter bar-gold [make-array grid-points]]
+[defparameter alpha-gold [/ 1.27 10000]]
+[defparameter init-temp 0]
+[defparameter r 0.25]
+[defparameter dx [/ bar-length [- grid-points 1]]]
+[defparameter dt [* r alpha-gold dx dx]]
 
+[dotimes (i grid-points)
+	[setf [aref bar-gold i] init-temp]]
+
+[princ bar-gold]
 [exit]
 
 [load "quicklisp"]
