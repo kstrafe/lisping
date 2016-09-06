@@ -13,26 +13,27 @@
 [defparameter r 0.25]
 [defparameter dx [/ bar-length [- grid-points 1]]]
 [defparameter dt [/ [* r dx dx] alpha-gold]]
-[defparameter t-end 4.0]
+[defparameter t-end 400.0]
 [defparameter time-current 0.0]
 [defparameter left-temp -100.0]
 [defparameter right-temp 500.0]
 
 [dotimes (i grid-points)
 	[setf [aref bar-gold-new i] init-temp]]
+[setf [aref bar-gold-new 0] left-temp]
+[setf [aref bar-gold-new [- grid-points 1]] right-temp]
 
 [loop while [< time-current t-end] do
 	[setf time-current [+ time-current dt]]
-	[do ((i 2 [+ i 1])) ((>= i [- grid-points 2]))
-		[print i]
-		[dotimes (i grid-points)
-			[setf [aref bar-gold i] init-temp]]
-		[setf [aref bar-gold 0] left-temp]
-		[setf [aref bar-gold [- grid-points 1]] right-temp]
-		[print bar-gold]
-		[print [aref bar-gold 0]]
-		[setf [aref bar-gold-new i] [+ [aref bar-gold i] [* r [+ (aref bar-gold [+ i 1]) (* -2 [aref bar-gold i]) (aref bar-gold [- i 1])]]]]
-		[print [aref bar-gold-new 1]]]]
+
+	[dotimes (i grid-points)
+		[setf [aref bar-gold i] [aref bar-gold-new i]]]
+
+	[do ((i 1 [+ i 1])) ((> i [- grid-points 2]))
+		[setf [aref bar-gold-new i] [+ [aref bar-gold i] [* r [+ (aref bar-gold [+ i 1]) (* -2 [aref bar-gold i]) (aref bar-gold [- i 1])]]]]]
+
+	]
+
 
 [setf [aref bar-gold 1] [+ [aref bar-gold 1] [* r [+ (aref bar-gold [+ 1 1]) (* -2 [aref bar-gold 1]) (aref bar-gold [- 1 1])]]]]
 [dotimes (i grid-points)
