@@ -9,29 +9,34 @@
 [defparameter bar-gold [make-array grid-points]]
 [defparameter bar-gold-new [make-array grid-points]]
 [defparameter alpha-gold [/ 1.27 10000]]
-[defparameter init-temp 0]
+[defparameter init-temp 0.0]
 [defparameter r 0.25]
 [defparameter dx [/ bar-length [- grid-points 1]]]
 [defparameter dt [/ [* r dx dx] alpha-gold]]
-[defparameter t-end 4]
-[defparameter time-current 0]
-[defparameter left-temp -100]
-[defparameter right-temp 500]
+[defparameter t-end 4.0]
+[defparameter time-current 0.0]
+[defparameter left-temp -100.0]
+[defparameter right-temp 500.0]
 
 [dotimes (i grid-points)
 	[setf [aref bar-gold-new i] init-temp]]
 
 [loop while [< time-current t-end] do
-	[do ((i 1 [+ i 1])) ((>= i [- grid-points 1]))
-		[setf time-current [+ time-current dt]]
-		[setf bar-gold bar-gold-new]
+	[setf time-current [+ time-current dt]]
+	[do ((i 2 [+ i 1])) ((>= i [- grid-points 2]))
+		[print i]
+		[dotimes (i grid-points)
+			[setf [aref bar-gold i] init-temp]]
 		[setf [aref bar-gold 0] left-temp]
 		[setf [aref bar-gold [- grid-points 1]] right-temp]
+		[print bar-gold]
+		[print [aref bar-gold 0]]
 		[setf [aref bar-gold-new i] [+ [aref bar-gold i] [* r [+ (aref bar-gold [+ i 1]) (* -2 [aref bar-gold i]) (aref bar-gold [- i 1])]]]]
-		[defparameter bar-gold-new [make-array grid-points]]]]
+		[print [aref bar-gold-new 1]]]]
 
-
-[princ bar-gold-new]
+[setf [aref bar-gold 1] [+ [aref bar-gold 1] [* r [+ (aref bar-gold [+ 1 1]) (* -2 [aref bar-gold 1]) (aref bar-gold [- 1 1])]]]]
+[dotimes (i grid-points)
+	[print [aref bar-gold i]]]
 [exit]
 
 [load "quicklisp"]
