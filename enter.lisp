@@ -3,17 +3,17 @@
 ; Let's try doing some numerical solving of PDEs...
 ; Use the FTCS method with reservoirs on both ends
 ; A metal rod, 1D
-; T^{n+1}_j = T^n_j + alpha*dt/dx/dx*(T_{j+1} - 2T + T_{j-1}
+; T^{n+1}_j = T^n_j + alpha*dt/dx/dx*(T_{j+1} - 2T + T_{j-1})
 [defparameter bar-length 1]
 [defparameter grid-points 100]
 [defparameter bar-gold [make-array grid-points]]
 [defparameter bar-gold-new [make-array grid-points]]
 [defparameter alpha-gold [/ 1.27 10000]]
 [defparameter init-temp 0.0]
-[defparameter r 0.25]
+[defparameter r 0.1]
 [defparameter dx [/ bar-length [- grid-points 1]]]
 [defparameter dt [/ [* r dx dx] alpha-gold]]
-[defparameter t-end 400.0]
+[defparameter t-end 10.00]
 [defparameter time-current 0.0]
 [defparameter left-temp -100.0]
 [defparameter right-temp 500.0]

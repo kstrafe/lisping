@@ -13,14 +13,14 @@
 				[freeze [above t (beside t t)]]]]]]
 [save-image tri "file.png"]
 ]
-[display "A racket source file"]
+[displayln "A racket source file"]
 
 
 [define-syntax foo
 	[syntax-rules (:)
 		; We write patterns here
-		[(_ [x]) (display "we wuz kangz")]
-		[(_ : x) (display x)]]]
+		[(_ [x]) (displayln "we wuz kangz")]
+		[(_ : x) (displayln x)]]]
 
 [define-syntax swap
 	[syntax-rules ()
@@ -33,36 +33,30 @@
 		[(_ name (arg ...) body ...) (
 			define (name arg ...) [begin body ...])]]]
 
-[fn whatever () [display "function whatever"]]
-[display "\n"]
-[fn bar (value other) [display [+ value other]]]
+[fn whatever () [displayln "function whatever"]]
+[fn bar (value other) [displayln [+ value other]]]
 [whatever]
-[display "\n"]
 [bar 1 2]
 
-[when #f [display 'cool] [display 'nice]]
+[when #f [displayln 'cool] [displayln 'nice]]
 
-[display "\n"]
-
-[define-syntax displays
+[define-syntax displaylns
 	[syntax-rules ()
-		[(_ a ...) (display (list a ...))]]]
+		[(_ a ...) (displayln (list a ...))]]]
 
 [define-syntax loop
 	[syntax-rules ()
 		[(loop body ...) (let looper () [begin body ... (looper)])]]]
 
 [define x 1]
-;[loop [displays x "\n"] [sleep 0.05] [set! x (+ x 1)]]
+;[loop [displaylns x "\n"] [sleep 0.05] [set! x (+ x 1)]]
 
 [let ([tmp 100] [a 3] [c 45])
 	[swap a c]
-	[displays a c]
-	[display a]
-	[display "\n"]
-	[display c]
-	[display "\n"]]
-[begin [display 1] [display 23]]
+	[displaylns a c]
+	[displayln a]
+	[displayln c]]
+[begin [displayln 1] [displayln 23]]
 
 [foo : 'we-really-need-some-help-over-here!]
 
@@ -70,11 +64,23 @@
 [define hit #t]
 [when hit
 	[set! max-hp [- max-hp 1]]]
-[display max-hp]
+[displayln max-hp]
 
-[fn kek () [display "We kek around a lot"]]
+[fn kek () [displayln "We kek around a lot"]]
 [kek]
 
-[display "\n~a"]
+[define-syntax warn
+	[syntax-rules ()
+		[(warn body ...) [displayln (quote (body ...))]]]]
+
+
+[fn info (x) [displayln x]]
+[info '(ok 100)]
+
+[define curdate [seconds->date [current-seconds]]]
+[displayln curdate]
+[displayln [rest curdate]]
+[warn key 10 nice stuff]
+
 
 ]
