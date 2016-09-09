@@ -79,8 +79,12 @@
 
 [define curdate [seconds->date [current-seconds]]]
 [displayln curdate]
-[displayln [rest curdate]]
 [warn key 10 nice stuff]
 
+[define-syntax name
+	[syntax-rules () ; Put literals here
+		[(_ arg) (quote arg)]]]
+
+[name kek]
 
 ]
