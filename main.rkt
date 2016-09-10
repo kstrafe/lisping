@@ -85,6 +85,16 @@
 	[syntax-rules () ; Put literals here
 		[(_ arg) (quote arg)]]]
 
+[fn variadic (a b c)
+	[displayln [quote [a b c]]]]
+
+[define-syntax variadic-macro
+	[syntax-rules ()
+		[(_ a b c) (quote [a b c])]]]
+
+[variadic 1 2 kek]
+[variadic-macro 1 2 kek]
+
 [name kek]
 
 ]
