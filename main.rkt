@@ -95,6 +95,11 @@
 [variadic 1 2 kek]
 [variadic-macro 1 2 kek]
 
+[define a 1]
+[loop
+	[set! a [+ a 1]]
+	[displayln a]]
+
 [name kek]
 
 ]
