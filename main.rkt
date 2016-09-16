@@ -95,6 +95,13 @@
 [variadic 1 2 kek]
 [variadic-macro 1 2 kek]
 
+(fn rek [x] [* x x x x])
+[fn fact [n]
+	[if [<= n 0]
+		1
+		[* n [fact [- n 1]]]]]
+
+
 [define a 1]
 [loop
 	[set! a [+ a 1]]
