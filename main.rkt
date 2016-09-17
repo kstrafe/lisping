@@ -101,6 +101,10 @@
 		1
 		[* n [fact [- n 1]]]]]
 
+[displayln "WWWWWWWWWWW"]
+[displayln [quasiquote [unquote [* 1 100]]]]
+[displayln [quote [* 1 100]]]
+
 
 [define a 1]
 [loop
