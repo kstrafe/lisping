@@ -105,6 +105,43 @@
 [displayln [quasiquote [unquote [* 1 100]]]]
 [displayln [quote [* 1 100]]]
 
+[displayln [case [random 4]
+	[(0) 'zero]
+	[(1) 'one]
+	[else 'other]]]
+
+[displayln [cond
+	[(= [random 10] 0) 'zero]
+	[else 'other]]]
+
+[define example [make-parameter "an example"]]
+[fn whatever2 () [displayln [example]]]
+[whatever2]
+[parameterize ([example "something different"])
+	[whatever2]]
+[whatever2]
+
+[struct pos (x y z) #:prefab #:mutable]
+[let* ([p [pos 8 2 3]]
+       [x p])
+  [set-pos-x! p 10]
+  [displayln [pos-x p]]
+  [displayln p]]
+
+[displayln 10]
+
+[define saved-k #f]
+[define [save-it!]
+	[call-with-composable-continuation
+		[lambda (k)
+			(set! saved-k k)
+			0]]]
+[* 3 [+ 7 [save-it!]]]
+[saved-k 0]
+[saved-k 10]
+
+
+[exit]
 
 [define a 1]
 [loop
