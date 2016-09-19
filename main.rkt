@@ -140,6 +140,16 @@
 [saved-k 0]
 [saved-k 10]
 
+[define-syntax-rule (swaps x y)
+	[let ([tmp x])
+		[set! x y]
+		[set! y tmp]]]
+
+[define xs 1]
+[define y 100]
+[swaps xs y]
+[displayln xs]
+
 
 [exit]
 
@@ -149,5 +159,8 @@
 	[displayln a]]
 
 [name kek]
+
+
+
 
 ]
