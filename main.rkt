@@ -155,6 +155,27 @@
 [[func 8] 2]
 [[funcs 10] 3]
 
+[map [lambda (x) (* x x)] '[1 2 3]]
+;[map [lambda (x) (* x x)] [in-range 0 10]]
+[for/sum ([i [in-range 0 10]]) [displayln i] i]
+
+[define-syntax-rule [macro x ...] [define-syntax-rule x ...]]
+
+
+;[define-syntax-rule [alias x y]
+	;[define-syntax-rule [x args ...]
+	;[y args ...]]]
+[define-syntax syntax-transform
+	[lambda (stx)
+		(syntax "The returned syntax")]]
+[syntax-transform]
+
+[define-syntax [keks-for-pepe synt]
+	[write synt]
+	[datum->syntax synt [cdr [syntax->datum synt]]]]
+
+[displayln [keks-for-pepe + 1 2]]
+[displayln "OK"]
 
 [exit]
 
