@@ -54,5 +54,28 @@ stx
 ; a-constant-value ; This won't work during runtime
 
 
+[define-syntax [using-syntax-case stx]
+	[syntax-case stx ()
+		[(_ condition true-expr false-expr)
+		 #'(cond [condition true-expr]
+		         [else false-expr])]]]
+[using-syntax-case #t "Yes" "No"]
+[using-syntax-case #f "Yes" "No"]
+; [using-syntax-case #f "Yes" "No" "error"] ; "bad syntax"
+
+[define-syntax-rule [another-if condition true-expr false-expr]
+	[cond [condition true-expr]
+	      [else false-expr]]]
+[another-if #t "Completely True" "Completely False"]
+[another-if #f "Completely True" "Completely False"]
+
+[define-for-syntax [replace-first datum with]
+	[displayln datum]
+	[cons with [cddr datum]]]
+
+[define-syntax [macro stx]
+	[displayln [replace-first [syntax->datum stx] 'control]]
+	#'(void)]
+[macro we are kek]
 
 ]
