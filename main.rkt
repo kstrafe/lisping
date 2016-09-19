@@ -150,6 +150,9 @@
 [swaps xs y]
 [displayln xs]
 
+[define ((func r1) r2) [* r1 r2]]
+[[func 8] 2]
+
 
 [exit]
 
