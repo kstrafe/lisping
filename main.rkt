@@ -151,7 +151,9 @@
 [displayln xs]
 
 [define ((func r1) r2) [* r1 r2]]
+[fn [funcs a] [b] [display [* b a]]]
 [[func 8] 2]
+[[funcs 10] 3]
 
 
 [exit]
