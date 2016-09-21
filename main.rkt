@@ -76,6 +76,11 @@ stx
 [define-syntax [macro stx]
 	[displayln [replace-first [syntax->datum stx] 'control]]
 	#'(void)]
-[macro we are kek]
+[macro do [we are kek]]
+
+[define [replace-first in-list with]
+	[cons with [cdr in-list]]]
+
+[replace-first '[we are warriors] 'i]
 
 ]
