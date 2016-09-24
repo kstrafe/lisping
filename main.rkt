@@ -137,13 +137,28 @@ stx
 [define ns [make-base-namespace]]
 
 [with-output-to-file "stuff.txt"
-[lambda () [write '[+ 1 2 3]]]
-#:exists 'replace]
+	#:exists 'replace
+	[lambda () [write '[+ 1 2 3]]]]
 [with-input-from-file "stuff.txt"
-[lambda () [eval [read] ns]]]
+	[lambda () [eval [read] ns]]]
 
 [define x 10]
 
 [write x]
+
+[require opengl]
+[require racket/gui]
+
+[define frame [new frame% [label "Frame"]
+                          [width 300]
+													[height 300]]]
+[send frame show #t]
+
+[define canvas [new canvas% [parent frame]
+						 [style '[gl]]
+						 [gl-config #t]]]
+
+
+[glClear 1]
 
 ]
