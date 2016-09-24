@@ -1,6 +1,6 @@
 [module main racket
 
-(require sgl/gl racket/gui)
+(require opengl opengl/util racket/gui)
 
 (define (resize w h)
   (glViewport 0 0 w h))
@@ -22,11 +22,11 @@
   (glLoadIdentity)
 
   (glBegin GL_TRIANGLES)
-  (glColor3f 1 0 0)
+  (glColor3f 1.0 0.0 0.0)
   (glVertex3d 0.25 0.25 0.0)
-  (glColor3f 0 1 0)
+  (glColor3f 0.0 1.0 0.0)
   (glVertex3d 0.75 0.25 0.0)
-  (glColor3f 0 0 1)
+  (glColor3f 0.0 0.0 1.0)
   (glVertex3d 0.75 0.75 0.0)
   (glEnd))
 
