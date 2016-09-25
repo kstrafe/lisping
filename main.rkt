@@ -15,9 +15,32 @@
 (define (resize w h)
   (glViewport 0 0 w h))
 
+[define an 0.0]
+
 (define (draw-opengl)
-  ;(glClearColor 0.0 0.0 0.0 0.0)
+  (glClearColor 0.2 0.3 0.3 1.0)
+	[glPolygonMode GL_FRONT_AND_BACK GL_LINE]
   (glClear [bitwise-ior GL_COLOR_BUFFER_BIT GL_DEPTH_BUFFER_BIT])
+
+	[define mvp [glGetUniformLocation program "mvp"]]
+	[printf "x-translate: "]
+	[set! an [+ an 0.01]]
+	[define translate
+		[matrix [[1.0 0.0 0.0 [sin an]]
+	           [0.0 1.0 0.0 [/ [cos an] 2]]
+	           [0.0 0.0 1.0 [sin an]]
+	           [0.0 0.0 0.0 1.0]]]]
+	[printf "scale: "]
+	[define fac 1]
+	[define scale
+		[matrix [[fac 0.0 0.0 0.0]
+	           [0.0 fac 0.0 0.0]
+	           [0.0 0.0 fac 0.0]
+	           [0.0 0.0 0.0 1.0]]]]
+	[define result [matrix* [matrix-transpose translate] [matrix-transpose scale]]]
+	[define converted [list->f32vector [matrix->list result]]]
+	[glUniformMatrix4fv mvp 1 #f converted]
+
 
   ;(glShadeModel GL_SMOOTH)
 
@@ -29,7 +52,7 @@
 
 	[glEnableVertexAttribArray 0]
 	[glBindBuffer GL_ARRAY_BUFFER v-buffer]
-	[glVertexAttribPointer 0 3 GL_FLOAT #f 0 0]
+	[glVertexAttribPointer 0 3 GL_FLOAT #f 12 0]
 	[glDrawArrays GL_TRIANGLES 0 3]
 	[glDisableVertexAttribArray 0]
 
@@ -51,7 +74,8 @@
       (with-gl-context
         (lambda ()
           (draw-opengl)
-          (swap-gl-buffers))))
+          (swap-gl-buffers)
+					[on-paint])))
 
     (define/override (on-size width height)
       (with-gl-context
@@ -94,9 +118,9 @@
 
 	[define vertex-buffers [glGenBuffers 1]]
 	[define vertex-buffer [u32vector-ref vertex-buffers 0]]
-	[define vertex-buffer-data '[-1.0 -1.0 0.0
-	                              1.0 -1.0 0.0
-	                              0.0  1.0 0.0]]
+	[define vertex-buffer-data '[-1.0 -1.0 1.0
+	                              1.0 -1.0 1.0
+	                              0.0  1.0 1.0]]
 	[define vertex-buffer-f32 [list->f32vector vertex-buffer-data]]
 	[define-values [type pointer] [gl-vector->type/cpointer vertex-buffer-f32]]
 	[glBindBuffer GL_ARRAY_BUFFER vertex-buffer]
@@ -122,28 +146,9 @@
 	[glDeleteShader f-shader]
 
 	[glUseProgram program]
+	[values program vertex-buffer]]
 
-	[define mvp [glGetUniformLocation program "mvp"]]
-
-	[define translate
-		[matrix [[1.0 0.0 0.0 0.0]
-	           [0.0 1.0 0.0 0.0]
-	           [0.0 0.0 1.0 0.0]
-	           [0.0 0.0 0.0 1.0]]]]
-	[define scale
-		[matrix [[0.5 0.0 0.0 0.0]
-	           [0.0 0.5 0.0 0.0]
-	           [0.0 0.0 0.5 0.0]
-	           [0.0 0.0 0.0 1.0]]]]
-
-	[define result [matrix* translate scale]]
-	[define converted [list->f32vector [matrix->list result]]]
-
-	[glUniformMatrix4fv mvp 1 #f converted]
-
-	vertex-buffer]
-
-[define v-buffer [send gl with-gl-context create-shader]]
+[define-values [program v-buffer] [send gl with-gl-context create-shader]]
 
 
 ]
