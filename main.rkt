@@ -19,19 +19,20 @@
 
 (define (draw-opengl)
   (glClearColor 0.2 0.3 0.3 1.0)
-	[glPolygonMode GL_FRONT_AND_BACK GL_LINE]
+	;[glPolygonMode GL_FRONT_AND_BACK GL_LINE]
   (glClear [bitwise-ior GL_COLOR_BUFFER_BIT GL_DEPTH_BUFFER_BIT])
 
 	[define mvp [glGetUniformLocation program "mvp"]]
 	[printf "x-translate: "]
 	[set! an [+ an 0.01]]
 	[define translate
-		[matrix [[1.0 0.0 0.0 [sin an]]
+		[matrix [[1.0 0.0 0.0 [/ [sin an] 2]]
 	           [0.0 1.0 0.0 [/ [cos an] 2]]
-	           [0.0 0.0 1.0 [sin an]]
+	           [0.0 0.0 1.0 [/ [sin an] 2]]
 	           [0.0 0.0 0.0 1.0]]]]
 	[printf "scale: "]
-	[define fac 1]
+	[define fac [max [abs [sin an]] [abs [cos an]]]]
+	[set! fac [/ fac 2]]
 	[define scale
 		[matrix [[fac 0.0 0.0 0.0]
 	           [0.0 fac 0.0 0.0]
@@ -40,7 +41,6 @@
 	[define result [matrix* [matrix-transpose translate] [matrix-transpose scale]]]
 	[define converted [list->f32vector [matrix->list result]]]
 	[glUniformMatrix4fv mvp 1 #f converted]
-
 
   ;(glShadeModel GL_SMOOTH)
 
@@ -54,16 +54,7 @@
 	[glBindBuffer GL_ARRAY_BUFFER v-buffer]
 	[glVertexAttribPointer 0 3 GL_FLOAT #f 12 0]
 	[glDrawArrays GL_TRIANGLES 0 3]
-	[glDisableVertexAttribArray 0]
-
-	[square -0.05 -0.05 0.1]
-
-	[square 1.0 0.0 0.1] ;; Outside
-	[square 1.0 1.0 0.1] ;; Outside
-
-	[square -1.0 -1.0 0.1]
-	[square 0.9 -1.0 0.1]
-	)
+	[glDisableVertexAttribArray 0])
 
 
 (define my-canvas%
@@ -83,7 +74,6 @@
           (resize width height))))
 
     (super-instantiate () (style '(gl)))))
-
 
 
 (define win (new frame% (label "My Game") (min-width 200) (min-height 200)))
