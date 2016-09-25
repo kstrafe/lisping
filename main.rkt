@@ -4,7 +4,6 @@
 
 [define [square x y scale]
 	[glBegin GL_TRIANGLES]
-	[glColor3f 1.0 1.0 1.0]
 	[glVertex3d x y 0.0]
 	[glVertex3d [+ x scale] y 0.0]
 	[glVertex3d x [+ y scale] 0.0]
@@ -34,7 +33,13 @@
 	[glDrawArrays GL_TRIANGLES 0 3]
 	[glDisableVertexAttribArray 0]
 
-	[square 0.45 0.45 0.1]
+	[square -0.05 -0.05 0.1]
+
+	[square 1.0 0.0 0.1] ;; Outside
+	[square 1.0 1.0 0.1] ;; Outside
+
+	[square -1.0 -1.0 0.1]
+	[square 0.9 -1.0 0.1]
 	)
 
 
@@ -69,13 +74,18 @@
 
 	[define vertex-buffers [glGenBuffers 1]]
 	[define vertex-buffer [u32vector-ref vertex-buffers 0]]
+	#|
 	[define vertex-buffer-data '[-1.0 -1.0 0.0
 	                              1.0 -1.0 0.0
 	                              0.0  1.0 0.0]]
+	|#
+	[define vertex-buffer-data '[ 0.4  0.4 0.0
+	                              0.5  0.5 0.0
+	                              0.4  0.5 0.0]]
 	[define vertex-buffer-f32 [list->f32vector vertex-buffer-data]]
 	[define-values [type pointer] [gl-vector->type/cpointer vertex-buffer-f32]]
 	[glBindBuffer GL_ARRAY_BUFFER vertex-buffer]
-	[glBufferData GL_ARRAY_BUFFER [length vertex-buffer-data] pointer GL_STATIC_DRAW]
+	[glBufferData GL_ARRAY_BUFFER [* 4 [length vertex-buffer-data]] pointer GL_STATIC_DRAW]
 
 	[define v-shader [glCreateShader GL_VERTEX_SHADER]]
 	[define v-code [file->string "vertex.glsl"]]
@@ -85,7 +95,7 @@
 	[define v-log-length [glGetShaderiv v-shader GL_INFO_LOG_LENGTH]]
 	[when [> v-log-length 0]
 		[define-values [count bytes] [glGetShaderInfoLog v-shader v-log-length]]
-		[printf "Returned: ~a" bytes]]
+		[printf "Returned: ~a\n" bytes]]
 
 	[define f-shader [glCreateShader GL_FRAGMENT_SHADER]]
 	[define f-code [file->string "fragment.glsl"]]
@@ -95,7 +105,7 @@
 	[define f-log-length [glGetShaderiv f-shader GL_INFO_LOG_LENGTH]]
 	[when [> f-log-length 0]
 		[define-values [count bytes] [glGetShaderInfoLog f-shader f-log-length]]
-		[printf "Returned: ~a" bytes]]
+		[printf "Returned: ~a\n" bytes]]
 
 	[define program [glCreateProgram]]
 	[glAttachShader program v-shader]
@@ -105,7 +115,7 @@
 	[define p-log-length [glGetProgramiv program GL_INFO_LOG_LENGTH]]
 	[when [> p-log-length 0]
 		[define-values [count bytes] [glGetShaderInfoLog program p-log-length]]
-		[printf "Returned: ~a" bytes]]
+		[printf "Returned: ~a\n" bytes]]
 
 	[glDetachShader program v-shader]
 	[glDetachShader program f-shader]
