@@ -1,6 +1,6 @@
 [module main racket
 
-(require opengl opengl/util ffi/vector racket/gui)
+(require opengl opengl/util ffi/vector math/matrix racket/gui)
 
 [define [square x y scale]
 	[glBegin GL_TRIANGLES]
@@ -67,45 +67,43 @@
 
 (send win show #t)
 
+[define [make-shader file type]
+	[define shader [glCreateShader type]]
+	[define code [file->string file]]
+	[glShaderSource shader 1 [vector code] [s32vector [string-length code]]]
+	[glCompileShader shader]
+	[define compile-status [glGetShaderiv shader GL_COMPILE_STATUS]]
+	[define log-length [glGetShaderiv shader GL_INFO_LOG_LENGTH]]
+	[printf "compile-status ~a\n" compile-status]
+	[when [= compile-status 1]
+		[printf "Compiled shader OK\n"]]
+	[when [> log-length 0]
+		[define-values [count bytes] [glGetShaderInfoLog shader log-length]]
+		[printf "compile-error "]
+		[writeln bytes]]
+	shader]
+
+
 [define [create-shader]
 
+	[glEnable GL_DEPTH_TEST]
+	[glClearDepth 1.0]
+	[glDepthFunc GL_LEQUAL]
 	[define v-array [glGenVertexArrays 1]]
 	[glBindVertexArray [u32vector-ref v-array 0]]
 
 	[define vertex-buffers [glGenBuffers 1]]
 	[define vertex-buffer [u32vector-ref vertex-buffers 0]]
-	#|
 	[define vertex-buffer-data '[-1.0 -1.0 0.0
 	                              1.0 -1.0 0.0
 	                              0.0  1.0 0.0]]
-	|#
-	[define vertex-buffer-data '[ 0.4  0.4 0.0
-	                              0.5  0.5 0.0
-	                              0.4  0.5 0.0]]
 	[define vertex-buffer-f32 [list->f32vector vertex-buffer-data]]
 	[define-values [type pointer] [gl-vector->type/cpointer vertex-buffer-f32]]
 	[glBindBuffer GL_ARRAY_BUFFER vertex-buffer]
 	[glBufferData GL_ARRAY_BUFFER [* 4 [length vertex-buffer-data]] pointer GL_STATIC_DRAW]
 
-	[define v-shader [glCreateShader GL_VERTEX_SHADER]]
-	[define v-code [file->string "vertex.glsl"]]
-	[glShaderSource v-shader 1 [vector v-code] [s32vector [string-length v-code]]]
-	[glCompileShader v-shader]
-	[define v-compile-status [glGetShaderiv v-shader GL_COMPILE_STATUS]]
-	[define v-log-length [glGetShaderiv v-shader GL_INFO_LOG_LENGTH]]
-	[when [> v-log-length 0]
-		[define-values [count bytes] [glGetShaderInfoLog v-shader v-log-length]]
-		[printf "Returned: ~a\n" bytes]]
-
-	[define f-shader [glCreateShader GL_FRAGMENT_SHADER]]
-	[define f-code [file->string "fragment.glsl"]]
-	[glShaderSource f-shader 1 [vector f-code] [s32vector [string-length f-code]]]
-	[glCompileShader f-shader]
-	[define f-compile-status [glGetShaderiv f-shader GL_COMPILE_STATUS]]
-	[define f-log-length [glGetShaderiv f-shader GL_INFO_LOG_LENGTH]]
-	[when [> f-log-length 0]
-		[define-values [count bytes] [glGetShaderInfoLog f-shader f-log-length]]
-		[printf "Returned: ~a\n" bytes]]
+	[define v-shader [make-shader "vertex.glsl" GL_VERTEX_SHADER]]
+	[define f-shader [make-shader "fragment.glsl" GL_FRAGMENT_SHADER]]
 
 	[define program [glCreateProgram]]
 	[glAttachShader program v-shader]
@@ -124,6 +122,25 @@
 	[glDeleteShader f-shader]
 
 	[glUseProgram program]
+
+	[define mvp [glGetUniformLocation program "mvp"]]
+
+	[define translate
+		[matrix [[1.0 0.0 0.0 0.0]
+	           [0.0 1.0 0.0 0.0]
+	           [0.0 0.0 1.0 0.0]
+	           [0.0 0.0 0.0 1.0]]]]
+	[define scale
+		[matrix [[0.5 0.0 0.0 0.0]
+	           [0.0 0.5 0.0 0.0]
+	           [0.0 0.0 0.5 0.0]
+	           [0.0 0.0 0.0 1.0]]]]
+
+	[define result [matrix* translate scale]]
+	[define converted [list->f32vector [matrix->list result]]]
+
+	[glUniformMatrix4fv mvp 1 #f converted]
+
 	vertex-buffer]
 
 [define v-buffer [send gl with-gl-context create-shader]]
