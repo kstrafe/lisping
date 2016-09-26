@@ -1,46 +1,41 @@
 [module main racket
 
-(require opengl opengl/util ffi/vector math/matrix racket/gui)
+[require "shader.rkt"]
+[require opengl
+         opengl/util
+         ffi/vector
+         math/matrix
+         racket/gui]
 
-[define [square x y scale]
-	[glBegin GL_TRIANGLES]
-	[glVertex3d x y 0.0]
-	[glVertex3d [+ x scale] y 0.0]
-	[glVertex3d x [+ y scale] 0.0]
-	[glVertex3d x [+ y scale] 0.0]
-	[glVertex3d [+ x scale] [+ y scale] 0.0]
-	[glVertex3d [+ x scale] y 0.0]
-	[glEnd]]
-
-(define (resize w h)
-  (glViewport 0 0 w h))
+[define [resize w h]
+  [glViewport 0 0 w h]]
 
 [define an 0.0]
 
 (define (draw-opengl)
   (glClearColor 0.2 0.3 0.3 1.0)
-	;[glPolygonMode GL_FRONT_AND_BACK GL_LINE]
+  ;[glPolygonMode GL_FRONT_AND_BACK GL_LINE]
   (glClear [bitwise-ior GL_COLOR_BUFFER_BIT GL_DEPTH_BUFFER_BIT])
 
-	[define mvp [glGetUniformLocation program "mvp"]]
-	[printf "x-translate: "]
-	[set! an [+ an 0.01]]
-	[define translate
-		[matrix [[1.0 0.0 0.0 [/ [sin an] 2]]
-	           [0.0 1.0 0.0 [/ [cos an] 2]]
-	           [0.0 0.0 1.0 [/ [sin an] 2]]
-	           [0.0 0.0 0.0 1.0]]]]
-	[printf "scale: "]
-	[define fac [max [abs [sin an]] [abs [cos an]]]]
-	[set! fac [/ fac 2]]
-	[define scale
-		[matrix [[fac 0.0 0.0 0.0]
-	           [0.0 fac 0.0 0.0]
-	           [0.0 0.0 fac 0.0]
-	           [0.0 0.0 0.0 1.0]]]]
-	[define result [matrix* [matrix-transpose translate] [matrix-transpose scale]]]
-	[define converted [list->f32vector [matrix->list result]]]
-	[glUniformMatrix4fv mvp 1 #f converted]
+  [define mvp [glGetUniformLocation program "mvp"]]
+  [printf "x-translate: "]
+  [set! an [+ an 0.01]]
+  [define translate
+    [matrix [[1.0 0.0 0.0 [/ [sin an] 2]]
+             [0.0 1.0 0.0 [/ [cos an] 2]]
+             [0.0 0.0 1.0 [/ [sin an] 2]]
+             [0.0 0.0 0.0 1.0]]]]
+  [printf "scale: "]
+  [define fac [max [abs [sin an]] [abs [cos an]]]]
+  [set! fac [/ fac 2]]
+  [define scale
+    [matrix [[fac 0.0 0.0 0.0]
+             [0.0 fac 0.0 0.0]
+             [0.0 0.0 fac 0.0]
+             [0.0 0.0 0.0 1.0]]]]
+  [define result [matrix* [matrix-transpose translate] [matrix-transpose scale]]]
+  [define converted [list->f32vector [matrix->list result]]]
+  [glUniformMatrix4fv mvp 1 #f converted]
 
   ;(glShadeModel GL_SMOOTH)
 
@@ -50,11 +45,11 @@
   ;(glMatrixMode GL_MODELVIEW)
   ;(glLoadIdentity)
 
-	[glEnableVertexAttribArray 0]
-	[glBindBuffer GL_ARRAY_BUFFER v-buffer]
-	[glVertexAttribPointer 0 3 GL_FLOAT #f 12 0]
-	[glDrawArrays GL_TRIANGLES 0 3]
-	[glDisableVertexAttribArray 0])
+  [glEnableVertexAttribArray 0]
+  [glBindBuffer GL_ARRAY_BUFFER v-buffer]
+  [glVertexAttribPointer 0 3 GL_FLOAT #f 12 0]
+  [glDrawArrays GL_TRIANGLES 0 3]
+  [glDisableVertexAttribArray 0])
 
 
 (define my-canvas%
@@ -66,7 +61,7 @@
         (lambda ()
           (draw-opengl)
           (swap-gl-buffers)
-					[on-paint])))
+          [on-paint])))
 
     (define/override (on-size width height)
       (with-gl-context
@@ -81,62 +76,44 @@
 
 (send win show #t)
 
-[define [make-shader file type]
-	[define shader [glCreateShader type]]
-	[define code [file->string file]]
-	[glShaderSource shader 1 [vector code] [s32vector [string-length code]]]
-	[glCompileShader shader]
-	[define compile-status [glGetShaderiv shader GL_COMPILE_STATUS]]
-	[define log-length [glGetShaderiv shader GL_INFO_LOG_LENGTH]]
-	[printf "compile-status ~a\n" compile-status]
-	[when [= compile-status 1]
-		[printf "Compiled shader OK\n"]]
-	[when [> log-length 0]
-		[define-values [count bytes] [glGetShaderInfoLog shader log-length]]
-		[printf "compile-error "]
-		[writeln bytes]]
-	shader]
-
-
 [define [create-shader]
+  [glEnable GL_DEPTH_TEST]
+  [glClearDepth 1.0]
+  [glDepthFunc GL_LEQUAL]
+  [define v-array [glGenVertexArrays 1]]
+  [glBindVertexArray [u32vector-ref v-array 0]]
 
-	[glEnable GL_DEPTH_TEST]
-	[glClearDepth 1.0]
-	[glDepthFunc GL_LEQUAL]
-	[define v-array [glGenVertexArrays 1]]
-	[glBindVertexArray [u32vector-ref v-array 0]]
+  [define vertex-buffers [glGenBuffers 1]]
+  [define vertex-buffer [u32vector-ref vertex-buffers 0]]
+  [define vertex-buffer-data '[-1.0 -1.0 1.0
+                                1.0 -1.0 1.0
+                                0.0  1.0 1.0]]
+  [define vertex-buffer-f32 [list->f32vector vertex-buffer-data]]
+  [define-values [type pointer] [gl-vector->type/cpointer vertex-buffer-f32]]
+  [glBindBuffer GL_ARRAY_BUFFER vertex-buffer]
+  [glBufferData GL_ARRAY_BUFFER [* 4 [length vertex-buffer-data]] pointer GL_STATIC_DRAW]
 
-	[define vertex-buffers [glGenBuffers 1]]
-	[define vertex-buffer [u32vector-ref vertex-buffers 0]]
-	[define vertex-buffer-data '[-1.0 -1.0 1.0
-	                              1.0 -1.0 1.0
-	                              0.0  1.0 1.0]]
-	[define vertex-buffer-f32 [list->f32vector vertex-buffer-data]]
-	[define-values [type pointer] [gl-vector->type/cpointer vertex-buffer-f32]]
-	[glBindBuffer GL_ARRAY_BUFFER vertex-buffer]
-	[glBufferData GL_ARRAY_BUFFER [* 4 [length vertex-buffer-data]] pointer GL_STATIC_DRAW]
+  [define v-shader [make-shader "vertex.glsl" GL_VERTEX_SHADER]]
+  [define f-shader [make-shader "fragment.glsl" GL_FRAGMENT_SHADER]]
 
-	[define v-shader [make-shader "vertex.glsl" GL_VERTEX_SHADER]]
-	[define f-shader [make-shader "fragment.glsl" GL_FRAGMENT_SHADER]]
+  [define program [glCreateProgram]]
+  [glAttachShader program v-shader]
+  [glAttachShader program f-shader]
+  [glLinkProgram program]
+  [define link-status [glGetProgramiv program GL_LINK_STATUS]]
+  [define p-log-length [glGetProgramiv program GL_INFO_LOG_LENGTH]]
+  [when [> p-log-length 0]
+    [define-values [count bytes] [glGetShaderInfoLog program p-log-length]]
+    [printf "Returned: ~a\n" bytes]]
 
-	[define program [glCreateProgram]]
-	[glAttachShader program v-shader]
-	[glAttachShader program f-shader]
-	[glLinkProgram program]
-	[define link-status [glGetProgramiv program GL_LINK_STATUS]]
-	[define p-log-length [glGetProgramiv program GL_INFO_LOG_LENGTH]]
-	[when [> p-log-length 0]
-		[define-values [count bytes] [glGetShaderInfoLog program p-log-length]]
-		[printf "Returned: ~a\n" bytes]]
+  [glDetachShader program v-shader]
+  [glDetachShader program f-shader]
 
-	[glDetachShader program v-shader]
-	[glDetachShader program f-shader]
+  [glDeleteShader v-shader]
+  [glDeleteShader f-shader]
 
-	[glDeleteShader v-shader]
-	[glDeleteShader f-shader]
-
-	[glUseProgram program]
-	[values program vertex-buffer]]
+  [glUseProgram program]
+  [values program vertex-buffer]]
 
 [define-values [program v-buffer] [send gl with-gl-context create-shader]]
 
