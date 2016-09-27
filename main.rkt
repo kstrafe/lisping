@@ -19,11 +19,13 @@
 [define [appreciate]
   [display "Are you ready to be thanked [y/n]: "]
   [let ([ans [read]])
-  [if [eq? ans 'y]
-    [begin [displayln "Thank you for the awesome mix"]
-      [appreciate]]
-    [begin [displayln "Regardless, great job for the work"]
-      null]]]]
+    [match ans
+      ['y [displayln "Thank you for the awesome mix"]
+        [appreciate]]
+      ['n [displayln "Regardless, great job for the work"]
+        null]
+      [_ [displayln "Invalid input. Try again using [y/n]"]
+        [appreciate]]]]]
 
 [appreciate]
 [exit]
