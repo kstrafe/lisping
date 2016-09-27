@@ -1,11 +1,33 @@
 [module main racket
 
-[require "shader.rkt"]
-[require opengl
+[require racket/include
+         opengl
          opengl/util
          ffi/vector
          math/matrix
          racket/gui]
+[include "shader.rkt"]
+
+(define Y (lambda (b)((lambda (f)(b(lambda (x)((f f) x))))
+                (lambda (f)(b(lambda (x)((f f) x)))))))
+
+(define Fact
+  (Y (lambda (fact) (lambda (n) (if (zero? n) 1 (* n (fact (- n 1))))))))
+
+[displayln [Fact 5]]
+
+[define [appreciate]
+  [display "Are you ready to be thanked [y/n]: "]
+  [let ([ans [read]])
+  [if [eq? ans 'y]
+    [begin [displayln "Thank you for the awesome mix"]
+      [appreciate]]
+    [begin [displayln "Regardless, great job for the work"]
+      null]]]]
+
+[appreciate]
+[exit]
+
 
 [define [resize w h]
   [glViewport 0 0 w h]]
@@ -18,16 +40,17 @@
   (glClear [bitwise-ior GL_COLOR_BUFFER_BIT GL_DEPTH_BUFFER_BIT])
 
   [define mvp [glGetUniformLocation program "mvp"]]
-  [printf "x-translate: "]
   [set! an [+ an 0.01]]
+  [printf "x-translate: ~a\n" an]
   [define translate
     [matrix [[1.0 0.0 0.0 [/ [sin an] 2]]
              [0.0 1.0 0.0 [/ [cos an] 2]]
              [0.0 0.0 1.0 [/ [sin an] 2]]
              [0.0 0.0 0.0 1.0]]]]
-  [printf "scale: "]
   [define fac [max [abs [sin an]] [abs [cos an]]]]
+  [printf "scale: ~a\n" fac]
   [set! fac [/ fac 2]]
+  [collect-garbage 'minor]
   [define scale
     [matrix [[fac 0.0 0.0 0.0]
              [0.0 fac 0.0 0.0]
@@ -76,7 +99,7 @@
 
 (send win show #t)
 
-[define [create-shader]
+[define [setup-gl]
   [glEnable GL_DEPTH_TEST]
   [glClearDepth 1.0]
   [glDepthFunc GL_LEQUAL]
@@ -115,7 +138,7 @@
   [glUseProgram program]
   [values program vertex-buffer]]
 
-[define-values [program v-buffer] [send gl with-gl-context create-shader]]
+[define-values [program v-buffer] [send gl with-gl-context setup-gl]]
 
 
 ]
