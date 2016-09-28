@@ -8,13 +8,19 @@
          racket/gui]
 [include "shader.rkt"]
 
-(define Y (lambda (b)((lambda (f)(b(lambda (x)((f f) x))))
-                (lambda (f)(b(lambda (x)((f f) x)))))))
+(define Y
+  (lambda (b)
+    (
+      (lambda (f) (b (lambda (x) ((f f) x) )))
+      (lambda (f) (b (lambda (x) ((f f) x) )))
+    )
+  )
+)
 
 (define Fact
   (Y (lambda (fact) (lambda (n) (if (zero? n) 1 (* n (fact (- n 1))))))))
 
-[displayln [Fact 5]]
+[displayln [Fact 500]]
 
 [define [appreciate]
   [display "Are you ready to be thanked [y/n]: "]
