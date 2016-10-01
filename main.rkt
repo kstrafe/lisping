@@ -6,36 +6,8 @@
          ffi/vector
          math/matrix
          racket/gui]
+
 [include "shader.rkt"]
-
-(define Y
-  (lambda (b)
-    (
-      (lambda (f) (b (lambda (x) ((f f) x) )))
-      (lambda (f) (b (lambda (x) ((f f) x) )))
-    )
-  )
-)
-
-(define Fact
-  (Y (lambda (fact) (lambda (n) (if (zero? n) 1 (* n (fact (- n 1))))))))
-
-[displayln [Fact 500]]
-
-[define [appreciate]
-  [display "Are you ready to be thanked [y/n]: "]
-  [let ([ans [read]])
-    [match ans
-      ['y [displayln "Thank you for the awesome mix"]
-        [appreciate]]
-      ['n [displayln "Regardless, great job for the work"]
-        null]
-      [_ [displayln "Invalid input. Try again using [y/n]"]
-        [appreciate]]]]]
-
-[appreciate]
-[exit]
-
 
 [define [resize w h]
   [glViewport 0 0 w h]]
@@ -47,40 +19,32 @@
   ;[glPolygonMode GL_FRONT_AND_BACK GL_LINE]
   (glClear [bitwise-ior GL_COLOR_BUFFER_BIT GL_DEPTH_BUFFER_BIT])
 
-  [define mvp [glGetUniformLocation program "mvp"]]
+  [let [(mvp [glGetUniformLocation program "mvp"])]
   [set! an [+ an 0.01]]
   [printf "x-translate: ~a\n" an]
-  [define translate
+  [let [(translate
     [matrix [[1.0 0.0 0.0 [/ [sin an] 2]]
              [0.0 1.0 0.0 [/ [cos an] 2]]
              [0.0 0.0 1.0 [/ [sin an] 2]]
-             [0.0 0.0 0.0 1.0]]]]
-  [define fac [max [abs [sin an]] [abs [cos an]]]]
+             [0.0 0.0 0.0 1.0]]])]
+  [let [(fac [max [abs [sin an]] [abs [cos an]]])]
   [printf "scale: ~a\n" fac]
   [set! fac [/ fac 2]]
   [collect-garbage 'minor]
-  [define scale
+  [let [(scale
     [matrix [[fac 0.0 0.0 0.0]
              [0.0 fac 0.0 0.0]
              [0.0 0.0 fac 0.0]
-             [0.0 0.0 0.0 1.0]]]]
-  [define result [matrix* [matrix-transpose translate] [matrix-transpose scale]]]
-  [define converted [list->f32vector [matrix->list result]]]
+             [0.0 0.0 0.0 1.0]]])]
+  [let [(result [matrix* [matrix-transpose translate] [matrix-transpose scale]])]
+  [let [(converted [list->f32vector [matrix->list result]])]
   [glUniformMatrix4fv mvp 1 #f converted]
-
-  ;(glShadeModel GL_SMOOTH)
-
-  ;(glMatrixMode GL_PROJECTION)
-  ;(glLoadIdentity)
-  ;(glOrtho 0.0 1.0 0.0 1.0 -1.0 1.0)
-  ;(glMatrixMode GL_MODELVIEW)
-  ;(glLoadIdentity)
 
   [glEnableVertexAttribArray 0]
   [glBindBuffer GL_ARRAY_BUFFER v-buffer]
   [glVertexAttribPointer 0 3 GL_FLOAT #f 12 0]
   [glDrawArrays GL_TRIANGLES 0 3]
-  [glDisableVertexAttribArray 0])
+  [glDisableVertexAttribArray 0]]]]]]])
 
 
 (define my-canvas%
@@ -102,7 +66,7 @@
     (super-instantiate () (style '(gl)))))
 
 
-(define win (new frame% (label "My Game") (min-width 200) (min-height 200)))
+(define win (new frame% (label "OpenGL in Racket") (min-width 200) (min-height 200)))
 (define gl (new my-canvas% (parent win)))
 
 (send win show #t)
