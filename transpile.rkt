@@ -1,4 +1,20 @@
 #lang racket
+[require racket/gui]
+
+[define-syntax-rule (log-create name)
+  [... [define-syntax-rule (name elements ...)
+    [begin [print [list [current-inexact-milliseconds] 'name elements ...]] [displayln ""]]]]]
+
+[define-syntax (something stx)
+  [syntax-case stx ()
+    [(something first) #'[log-create first]]
+    [(something first rest ...) #'[begin [log-create first] [something rest ...]]]]]
+
+[something err crit warn info debug trace]
+[warn 1 2 3]
+[trace "current value of debt" 1]
+[err "Nice"]
+[exit]
 
 ; This is a draft of creating a racket-to-any-language transpiler.
 ; The idea is to use racket macros and functions to transpile racket to any language.
