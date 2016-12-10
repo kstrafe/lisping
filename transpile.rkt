@@ -1,5 +1,6 @@
 #lang racket
 
+[require racket/date]
 [include "extra.rkt"]
 
 [let loop ([i 0])
@@ -8,8 +9,9 @@
     [begin
       [parameterize ([*warn* #f] [*trce* [= [modulo i 2] 0]])
         [warn 'level i]
-        [trce 'depth i]]
+        [trce "dof" i]]
       [warn 123]
+      [sleep 0.1]
       [trce 'fuck]
       [loop [add1 i]]]]]
 [exit]
