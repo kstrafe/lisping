@@ -1,5 +1,9 @@
+#! /usr/bin/env racket
 #lang racket
 
+[require kekkus]
+[print *something*]
+[exit]
 [require racket/date]
 [include "extra.rkt"]
 
@@ -9,18 +13,17 @@
     [begin
       [parameterize ([*warn* #f] [*trce* [= [modulo i 2] 0]])
         [warn 'level i]
-        [trce "dof" i]]
-      [warn 123]
+        [trce "dof level" i]]
+      [warn "Using sleep here" 123]
       [sleep 0.1]
-      [trce 'fuck]
+      [trce 'woke]
       [loop [add1 i]]]]]
-[exit]
 
 [define cont #f]
 [begin
   [let ([iter [call/cc [lambda (x) [set! cont x] 0]]])
-    [when (= (modulo iter 100000) 0) [displayln iter]]
-    [cont [add1 iter]]]]
+    [when (= (modulo iter 1000000) 0) [info iter]]
+    [when (< iter 10000000) [cont [add1 iter]]]]]
 
 ; [require [planet neil/charterm:3:0]]
 ; [define w
