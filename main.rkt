@@ -3,7 +3,7 @@
 
 [require racket/serialize racket/gui ffi/vector math/matrix opengl opengl/util finalizer]
 [require [for-syntax racket/list]]
-[require "util.rkt"]
+[require "util.rkt" "logger.rkt"]
 
 [serializable-struct Point (x y) #:transparent #:guard
   [lambda (x y name)
@@ -75,9 +75,6 @@
                 [set! highest fh-y]]]]]
         [values current current-index]]]]]
 
-;;; Allows you to add floors to the 'footholds%' object
-;;; Use `[create-floor footholder-name [1 2] [3 4] ...]`
-;;; Where the numbers represent points
 [define-syntax (create-floor points)
   [define vertices [cdr [syntax->datum points]]]
   [define footholder-name [car vertices]]
@@ -105,6 +102,15 @@
         [warn 'current-index i]
         [send ,footholder-name connect-footholds i [add1 i]]]]]
   [datum->syntax #'safe final #'srcloc]]
+
+[define (pointify vertices)
+  [map [lambda (vertex)
+      [Point [car vertex] [cadr vertex]]]
+    vertices]]
+[define (sorted-on-x? points)
+  [apply < [map Point-x points]]]
+[sorted-on-x? [pointify '[[-4 0] [1 0] [2 0] [4 1]]]]
+
 
 [define player% [class object%
   [init]
@@ -155,6 +161,7 @@
   [glPolygonMode GL_FRONT_AND_BACK GL_LINE]
   [glClear [bitwise-ior GL_COLOR_BUFFER_BIT GL_DEPTH_BUFFER_BIT]]
   [let [(mvp [glGetUniformLocation program "mvp"])]
+    [dbug mvp]
     [set! an [+ an 0.01]]
     [trce "x-translate" an]
     [let [(translate
