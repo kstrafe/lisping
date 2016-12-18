@@ -25,65 +25,70 @@
 ;       [values empty empty]
 ;       [values new-x [map-x-to-y left right new-x]]]]]
 
-[require racket/generic racket/serialize racket/gui ffi/vector math/matrix opengl opengl/util finalizer]
-[require [for-syntax racket/list]]
+[require ffi/vector finalizer math/matrix opengl opengl/util racket/generic racket/gui racket/serialize]
+[require [for-syntax "logger.rkt" racket/list]]
 [require "classes.rkt" "util.rkt" "logger.rkt" "window.rkt"]
-[require [for-syntax "logger.rkt"]]
-; [directory-list]
 
-;[define mychar [map [lambda (x) [reverse [cons 1 [reverse x]]]] '[[0 0] [1 0] [1 1] [0 1]]]]
 [define mychar '[[0 0] [0.2 0] [0.2 0.2] [0 0.2]]]
 [define footholds '[[-1 0] [-0.5 -0.3] [0 0.2] [0.5 0.3] [1 0.1]]]
 
-(define-for-syntax (replace-first)
-  (let ((found #f))
-    (define (replacer exp old new)
-      (cond ((null? exp) '())
-        ((not (pair? exp))
-       (cond ((and (eq? exp old) (not found))
-         (set! found #t) new)
-            (else exp)))
-            (else
-     (cons (replacer (car exp) old new)
-        (replacer (cdr exp) old new)))))
-                          replacer))
+[define-for-syntax [replace-first]
+  [let ([found #f])
+    [define [replacer exp old new]
+      [cond
+        [[null? exp] '[]]
+        [[not [pair? exp]]
+          [cond
+            [[and [eq? exp old] [not found]]
+              [set! found #t] new]
+            [else exp]]]
+        [else
+          [cons [replacer [car exp] old new]
+          [replacer [cdr exp] old new]]]]]
+    replacer]]
+
 [define-syntax (loop syn)
-  [let ([elements [cdr [syntax->datum syn]]])
-  [let ([names [for/list ([i [car elements]]) [car i]]])
-  [let ([expression [cdr elements]])
-  [let ([to-ret [[replace-first] expression 'game-loop [cons 'game-loop names]]])
-  [let ([to-ret `[let game-loop ,[car elements] ,[cons 'begin to-ret]]])
-  [trce to-ret]
-  [datum->syntax syn to-ret]]]]]]]
+  [let* ([elements [cdr [syntax->datum syn]]]
+         [names [for/list ([i [car elements]]) [car i]]]
+         [expression [cdr elements]]
+         [to-ret [[replace-first] expression 'game-loop [cons 'game-loop names]]]
+         [to-ret `[let game-loop ,[car elements] ,[cons 'begin to-ret]]])
+           [trce to-ret]
+           [datum->syntax syn to-ret]]]
 
-[loop ([a 5] [b 3])
-  [trce a]
-  [let ([a [+ a b]])
-  [when #t
-    game-loop]]]
+[define (clamp number range)
+  [if [> number range]
+    0
+    number]]
 
-[define [rand v] [bitwise-and [+ [* v 1103515245] 12345] #x7fffffff]]
+[require racket/serialize]
+[struct state (continue? character footing monsters footholds) #:prefab]
+[serialize (state 1 2 3 4 5)]
 
-[exit]
+[require "logger.rkt"]
+[struct result (value error) #:prefab]
+[match [result 1000 #f]
+  [(result a #f) (trce "YAY" a)]
+  [(result _ #t) (trce "No :(")]]
 
-[let loop ([a 5] [b 3])
-  [let ([a [+ a b]])
-  [trce a]
-  [loop a b]]]
-[exit]
+[let loop (game-state)
+  [do
+    [<- game-state [check-collision game-state]]
+    [loop game-state]]]
 
 [let-values ([(program window) [new-game-window]])
   [trce "Initializing main state"]
   [let init ([continue? #t]
-             [an 0.0]
              [character [send window with-gl-context [lambda () [create-vertex-buffer mychar GL_TRIANGLE_FAN]]]]
              [footing [send window with-gl-context [lambda () [create-vertex-buffer footholds GL_LINE_STRIP]]]]
              [monsters #f]
              [footholds empty])
     [trce "Initialized main state finished OK"]
-    [let loop ([last-time [current-inexact-milliseconds]])
+    [let loop ([last-time [current-inexact-milliseconds]]
+               [an 0.0])
       [logic]
       [draw]
       [when continue?
-        [loop [current-inexact-milliseconds]]]]]]
+        [loop [current-inexact-milliseconds]
+              [clamp [+ an 0.01] 2]]]]]]
 [exit]
