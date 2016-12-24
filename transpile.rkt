@@ -1,8 +1,12 @@
 #! /usr/bin/env racket
 #lang racket
 
-[require rackunit]
-[require sugar]
+[require rackunit sugar]
+
+[require "typed.rkt"]
+[distance 0.3 "dude"]
+
+[exit]
 
 [define (nth list n)
   [if [= n 0]
@@ -74,12 +78,6 @@
 [define (semi-circle start-x start-y)
   [for/list ([x-value [range start-x [+ start-x 2] 1/1000]])
     [list x-value [/ [+ x-value [sin [* 12.0 x-value]] start-y] 4]]]]
-
-[define (recfun n)
-  [for/fold ([l '[1]])
-            ([i [range 2 n]])
-    [cons [* [car l] i] l]]]
-[recfun 15]
 
 [define m [semi-circle-map '[[0 0] [1 0] [2 0] [0 -2]]]]
 
